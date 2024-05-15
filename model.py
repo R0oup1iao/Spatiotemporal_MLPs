@@ -29,7 +29,7 @@ class MultiLayerPerceptron(nn.Module):
         return hidden
 
 
-class STID(nn.Module):
+class STMLP(nn.Module):
     def __init__(self, **model_args):
         super().__init__()
         # attributes
@@ -123,8 +123,12 @@ class STID(nn.Module):
         if day_in_week_emb is not None:
             tem_emb.append(day_in_week_emb)
         # concate all embeddings
-        if node_emb or tem_emb:
-            hidden = torch.cat([time_series_emb] + node_emb + tem_emb, dim=-1)
+        if node_emb is not None and tem_emb:
+            hidden = torch.cat([time_series_emb] + [node_emb] + tem_emb, dim=-1)
+        elif tem_emb:
+            hidden = torch.cat([time_series_emb] + tem_emb, dim=-1)
+        elif node_emb is not None:
+            hidden = torch.cat([time_series_emb] + [node_emb], dim=-1)
         else:
             hidden = time_series_emb
         # encoding

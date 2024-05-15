@@ -7,13 +7,13 @@ from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
 from config import args
 from dataset import STForecastingDataset
-from model import STID
+from model import STMLP
 
-class LightningSTID(L.LightningModule):
+class LightningSTMLP(L.LightningModule):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.model = STID(**args.model)
+        self.model = STMLP(**args.model)
         self.loss_fn = args.train.loss
 
     def forward(self, seq_x, seq_x_mark):
@@ -54,8 +54,8 @@ test_set = STForecastingDataset(args.train.root_path, flag='test')
 train_loader = torch.utils.data.DataLoader(train_set, batch_size=args.train.batch_size, shuffle=True)
 val_loader = torch.utils.data.DataLoader(val_set, batch_size=args.train.batch_size)
 test_loader = torch.utils.data.DataLoader(test_set, batch_size=args.train.batch_size)
-model = LightningSTID(args)
+model = LightningSTMLP(args)
 
-trainer = L.Trainer(max_steps=1000)
+trainer = L.Trainer(max_steps=10000)
 trainer.fit(model=model, train_dataloaders=train_loader, val_dataloaders=val_loader)
 trainer.test(dataloaders=test_loader, ckpt_path='best')
